@@ -1,7 +1,8 @@
 Hello there!
 
 This is a basic program to convert any jpeg or png into an html file filled with ASCII characters representing the image show. This is started as an offshoot to a game I've started to develop in order to increase my programming skills. In the mean time, enjoy!
-
+If you simply wish to download a .exe and run that locally, download the dist\IMS_ASCII folder and simply run the .exe within.
+If you want to look at the abysmal state of my code, download the rest!
 For now the html is just deposited under the same name with ".html" appeneded. I intend to change this feature soon so the user can designate a destination file name, but for now I'm rather pleased that it works!
 
                                                                                 
