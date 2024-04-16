@@ -1,12 +1,16 @@
 import tkinter as tk
+import os
 from tkinter import filedialog
 from ascii_magic import AsciiArt
+from PIL import ImageEnhance
 
 window = tk.Tk()
 selected_files = []
 columns = tk.IntVar()
 monochrome = tk.BooleanVar()
 full_color = tk.BooleanVar()
+brightness = tk.IntVar()
+IEBright = ImageEnhance.Brightness
 
 greeting = tk.Label(text="IMS + ASCII MAGIC converter")
 greeting.pack()
@@ -18,7 +22,7 @@ YesNo = ["Yes", "No"]
 BitDepth = ["16-bit", "8-bit"]
 
 def callback():
-    files = filedialog.askopenfilenames(filetypes=(("Image Files", (".png", ".jpg", ".tiff", ".jpeg", ".bmp", ".gif")),))
+    files = filedialog.askopenfilenames(filetypes=(("Image Files", (".png", ".jpg", ".tif", ".tiff", ".jpeg", ".bmp", ".gif")),))
     selected_files.clear()  # Clear the previous list of selected files
     selected_files.extend(files) # Store the file paths in the selected_files list
     update_selected_files_listbox()
@@ -31,16 +35,33 @@ def validate_input(new_value):
         return True  # Allow empty input
     if new_value.isdigit():
         value = int(new_value)
-        if 50 <= value <= 300:
+        if 50 <= value <= 800:
             return True
+    return False
+
+def validate_brightness_input(new_value):
+    if new_value =="":
+        return True # Allow for empty input
+    try:
+        value = float(new_value)
+        if 0 <= value <= 1:
+            return True
+    except ValueError:
+        pass
     return False
 
 
 # Column entry Box
-input_label = tk.Label(text="Enter the number of columns (50-300): default = 80")
+input_label = tk.Label(text="Enter the number of columns (50-800): default = 80")
 input_label.pack()
 input_entry = tk.Entry(window, textvariable=columns, validate="key", validatecommand=(window.register(validate_input), '%P'))
 input_entry.pack()
+
+# Brightness entry box
+brightness_label = tk.Label(text="Brightness 0 to 5: Default is 1")
+brightness_label.pack()
+brightness_entry = tk.Entry(window, textvariable=brightness, validate="key", validatecommand=(window.register(validate_brightness_input), '%P'))
+brightness_entry.pack()
 
 # Monochrome yay or nay
 monochrome_label = tk.Label(text="Monochrome:")
@@ -68,13 +89,19 @@ full_colour_menu.pack()
 def generate_ascii():
     if selected_files:
         for file_path in selected_files:
-            my_art = AsciiArt.from_image(file_path)
+            # Define the my_art object
+            my_art=AsciiArt.from_image(file_path)
+            # Apply Brightness transform
+            my_art.image=IEBright(my_art.image).enhance(int(brightness.get()) if brightness.get() else 1) # Provides a default value of 0 if it is empty 
+            #remove the original file extension
+            file_name_without_extension = os.path.splitext(file_path)[0]
+            # Save ASCII art to file
             my_art.to_html_file(
-                file_path + ".html",
-                monochrome=monochrome.get(),
+                file_name_without_extension + ".html",
+                monochrome=monochrome.get(),  
                 columns=int(columns.get()) if columns.get() else 80  # Provide a default value of 80 if the entry box is empty
             )
-            print("ASCII art generated and saved as", file_path + ".html")
+            print("ASCII art generated and saved as", file_name_without_extension + ".html")
     else:
         print("Please select a file beforegenerating ASCII art.")
 
