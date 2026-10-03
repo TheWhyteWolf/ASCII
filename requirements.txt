@@ -1,0 +1,3 @@
+ascii_magic==2.3.0
+Pillow==12.2.0
+tkinterdnd2==0.4.3
